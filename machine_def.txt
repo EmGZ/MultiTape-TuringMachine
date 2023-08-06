@@ -1,0 +1,9 @@
+3
+A B C
+3
+0 1
+2
+A 1 B X R | A 0 B Y R | A 1 B X R
+B 0 C Y R | B 1 C X R | B 0 C Y R 
+A
+C
