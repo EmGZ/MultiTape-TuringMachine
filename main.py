@@ -31,16 +31,16 @@ class MultiTapeTuringMachine:
         i = 0   # head_position index
         chk = 0 # checker if all inputs are within the transition
         for tape in (self.tapes):
-            print(tape)
+            # print(tape)
             current_symbol = tape[self.head_positions[i]]
-            print(current_symbol)
+            # print(current_symbol)
             key = (i, self.current_state, current_symbol)
             if key in self.transitions:
                 chk+=1
 
             i += 1
 
-        print("check: ", chk)
+        # print("check: ", chk)
         j = 0
         #if all tapes is in the transition, proceed to next state
         if chk == len(self.tapes):
@@ -52,6 +52,8 @@ class MultiTapeTuringMachine:
                 tape[self.head_positions[j]] = new_symbol
                 if move == 'L':
                     self.head_positions[j] -= 1 # Move Left
+                    if self.head_positions[j] < 0:
+                        return "You can't go to left any further"
                 elif move == 'R':
                     self.head_positions[j] += 1 # Move Right
                     if self.head_positions[j] >= len(tape):
@@ -59,11 +61,13 @@ class MultiTapeTuringMachine:
                 elif move == 'S':
                     self.head_positions[j] += 0 # Stationary
                 j += 1
-
             self.current_state = new_state    
+            return "Ongoing"
+        else:
+            return "No More Possible Transitions"
 
-        print(self.tapes)
-        print(self.head_positions)
+        # print(self.tapes)
+        # print(self.head_positions)
 
     def run(self):
         while self.current_state not in self.accept_states:
@@ -75,10 +79,13 @@ class MultiTapeTuringMachine:
     def display_current_configuration(self):
         i = 0
         for tape in (self.tapes):
-            head = self.head_positions[i]
-            left_tape = "".join(tape[:head])
-            right_tape = "".join(tape[head:])
-            print(f"Tape {i + 1}: {left_tape}[{tape[head]}]{right_tape}")
+            if self.head_positions[i] >= 0:
+                head = self.head_positions[i]
+                left_tape = "".join(tape[:head])
+                right_tape = "".join(tape[head+1:])
+                print(f"Tape {i + 1}: {left_tape}[{tape[head]}]{right_tape}")
+            else: 
+                 print(f"Tape {i + 1}: Dead")
 
             i += 1
 
@@ -136,10 +143,12 @@ if __name__ == "__main__":
     print("Initial Configuration:")
     tm.display_current_configuration()
 
-    while tm.current_state not in tm.accept_states:
+    state = "Ongoing"
+    while tm.current_state not in tm.accept_states and state == "Ongoing":
         user_input = input("Press 'n' to execute the next transition: ")
         if user_input.lower() == 'n':
-            tm.step()
+            state = tm.step()
+            print(state)
             print("After Step:")
             tm.display_current_configuration()
 
