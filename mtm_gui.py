@@ -142,7 +142,7 @@ def read_turing_machine_input(filename):
 class TuringMachineGUI(tk.Tk):
     def __init__(self, tm):
         super().__init__()
-        self.title("Turing Machine Simulator")
+        self.title("Multi-Tape Turing Machine Simulator")
         self.tm = tm
         self.create_widgets()
 
