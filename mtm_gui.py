@@ -63,7 +63,8 @@ class MultiTapeTuringMachine:
                 if move == 'L':
                     self.head_positions[j] -= 1 # Move Left
                     if self.head_positions[j] < 0:
-                        return "You can't go to left any further"
+                        tape.insert(0, '_')
+                        self.head_positions[j] = 0       
                 elif move == 'R':
                     self.head_positions[j] += 1 # Move Right
                     if self.head_positions[j] >= len(tape):
