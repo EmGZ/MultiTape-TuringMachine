@@ -24,9 +24,6 @@ class MultiTapeTuringMachine:
     def add_tape(self, tape):
         self.tapes.append(tape)
         self.head_positions.append(0)
-
-    def add_transition(self, state, read_symbol, new_state, write_symbol, move):
-        self.transitions[(state, read_symbol)] = (new_state, write_symbol, move)
     
     def add_transition_for_multi_tapes(self, tape_idx, transitions):
         transition_num = 0
@@ -178,7 +175,11 @@ class TuringMachineGUI(tk.Tk):
     def start(self):
         for i in range(len(self.tm.tapes)):
                 tape_content = self.tape_entries[i].get()
-                self.tm.tapes[i] = list(tape_content)
+                if not tape_content.strip():  # Check if the input is empty or contains only whitespaces
+                    self.tm.tapes[i] = ['_']  # Fill the tape with '_' if the input is null
+                else:
+                    self.tm.tapes[i] = list(tape_content)
+                self.tape_entries[i].config(state=tk.DISABLED) # Disable the tape once it starts
         self.output_text.insert(tk.END, "Starting: \n")
         self.display_current_configuration()
         self.step_button.config(state=tk.NORMAL)
@@ -223,6 +224,7 @@ class TuringMachineGUI(tk.Tk):
         self.output_text.delete(1.0, tk.END)
         # Clear all input entries
         for tape_entry in self.tape_entries:
+            tape_entry.config(state=tk.NORMAL)
             tape_entry.delete(0, tk.END)
 
 
