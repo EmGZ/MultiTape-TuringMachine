@@ -1,9 +1,16 @@
-3
-A B C
-3
-0 1
+4
+A B C D
 2
-A 1 B X R | A 0 B Y R | A 1 B X R
-B 0 C Y R | B 1 C X R | B 0 C Y R 
+a b c
+9
+A a A a R | A _ A a R 
+A b A b R | A _ A b R 
+A c B c S | A _ B _ L
+B c B c S | B a B a L
+B c B c S | B b B b L
+B c C c R | B _ C _ R
+C a C a R | C a C a R 
+C b C b R | C b C b R 
+C _ D _ S | C _ D _ S 
 A
-C
+D
