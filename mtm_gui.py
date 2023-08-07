@@ -42,6 +42,7 @@ class MultiTapeTuringMachine:
 
     def step(self):
         i = 0   # head_position index
+        highest_count = 0 # checker for transitions
         acc_trans = [] # Container for the transitions indices that are accepted
         for tape in (self.tapes):
             # print(tape)
@@ -56,13 +57,14 @@ class MultiTapeTuringMachine:
                     # print(idx)
 
             i += 1
+        
+        if acc_trans:
+            transition_count = {}  # Create a dictionary to store counts for each transition index
+            for idx in acc_trans:
+                transition_count[idx] = transition_count.get(idx, 0) + 1
 
-        transition_count = {}  # Create a dictionary to store counts for each transition index
-        for idx in acc_trans:
-            transition_count[idx] = transition_count.get(idx, 0) + 1
-
-        most_common_idx = max(transition_count, key=transition_count.get)
-        highest_count = transition_count[most_common_idx]
+            most_common_idx = max(transition_count, key=transition_count.get)
+            highest_count = transition_count[most_common_idx]
 
         # print("Highest Count: ", highest_count)
         # print("Most Common: ", most_common_idx)
