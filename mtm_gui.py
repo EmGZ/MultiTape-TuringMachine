@@ -4,16 +4,22 @@ from tkinter import scrolledtext
 class MultiTapeTuringMachine:
     def __init__(self):
         self.num_tapes = 0
+        self.num_transitions = 0
         self.tapes = []
         self.head_positions = []
         self.initial_state = None
         self.current_state = None
-        self.transitions = {}
+        self.transitions = []
         self.accept_states = set()
+
+    def initialize_transitions(self, transitions, tapes):
+        self.transitions = [[0] * transitions for _ in range(tapes)]
 
     def set_num_tapes(self, num_tapes):
         self.num_tapes = num_tapes
 
+    def set_num_transitions(self, num_transitions):
+        self.num_transitions = num_transitions
 
     def add_tape(self, tape):
         self.tapes.append(tape)
@@ -23,12 +29,12 @@ class MultiTapeTuringMachine:
         self.transitions[(state, read_symbol)] = (new_state, write_symbol, move)
     
     def add_transition_for_multi_tapes(self, tape_idx, transitions):
+        transition_num = 0
         for transition in transitions:
             current_state, read_symbol, new_state, write_symbol, move = transition
-            if (tape_idx, current_state, read_symbol) in self.transitions:
-                self.transitions[(tape_idx, current_state, read_symbol)].append((new_state, write_symbol, move))
-            else:
-                self.transitions[(tape_idx, current_state, read_symbol)] = [(new_state, write_symbol, move)]
+            self.transitions[tape_idx][transition_num] = (current_state, read_symbol, new_state, write_symbol, move)
+            # print(f"[{tape_idx}][{transition_num}]: ", self.transitions[tape_idx][transition_num])
+            transition_num += 1
 
     def set_initial_state(self, initial_state):
         self.current_state = initial_state
@@ -39,26 +45,37 @@ class MultiTapeTuringMachine:
 
     def step(self):
         i = 0   # head_position index
-        chk = 0 # checker if all inputs are within the transition
+        acc_trans = [] # Container for the transitions indices that are accepted
         for tape in (self.tapes):
             # print(tape)
             current_symbol = tape[self.head_positions[i]]
             # print(current_symbol)
-            key = (i, self.current_state, current_symbol)
-            if key in self.transitions:
-                chk+=1
+            key = (self.current_state, current_symbol)
+            for idx, transition in enumerate(self.transitions[i]):
+                # print("trans: ", transition[:2])
+                # print(idx)
+                if transition[:2] == key:
+                    acc_trans.append(idx)
+                    # print(idx)
 
             i += 1
+
+        transition_count = {}  # Create a dictionary to store counts for each transition index
+        for idx in acc_trans:
+            transition_count[idx] = transition_count.get(idx, 0) + 1
+
+        most_common_idx = max(transition_count, key=transition_count.get)
+        highest_count = transition_count[most_common_idx]
+
+        # print("Highest Count: ", highest_count)
+        # print("Most Common: ", most_common_idx)
 
         # print("check: ", chk)
         j = 0
         #if all tapes is in the transition, proceed to next state
-        if chk == len(self.tapes):
+        if highest_count == len(self.tapes):
             for tape in (self.tapes):
-                current_symbol = tape[self.head_positions[j]]
-                key = (j, self.current_state, current_symbol)
-                for x in self.transitions[key]:
-                    new_state, new_symbol, move = x 
+                a, b, new_state, new_symbol, move = self.transitions[j][most_common_idx] 
                 tape[self.head_positions[j]] = new_symbol
                 if move == 'L':
                     self.head_positions[j] -= 1 # Move Left
@@ -72,13 +89,14 @@ class MultiTapeTuringMachine:
                 elif move == 'S':
                     self.head_positions[j] += 0 # Stationary
                 j += 1
+                # print(tape)
+            # print(self.head_positions)
             self.current_state = new_state    
             return "Ongoing"
         else:
             return "No More Possible Transitions"
 
         # print(self.tapes)
-        # print(self.head_positions)
 
     def is_accepted(self):
         return self.current_state in self.accept_states
@@ -95,6 +113,7 @@ def read_turing_machine_input(filename):
         tm = MultiTapeTuringMachine()
 
         transitions_for_tapes = [[] for _ in range(num_tapes)]  # Initialize empty transition list for each tape
+        tm.initialize_transitions(num_transitions, num_tapes)
 
         for _ in range(num_transitions):
             transition_data = file.readline().strip().split('|')
@@ -108,13 +127,15 @@ def read_turing_machine_input(filename):
                     transitions_for_tapes[tape_idx].extend(transitions)
 
         for tape_idx, transitions in enumerate(transitions_for_tapes):
-            print(tape_idx, transitions)
+            # print(tape_idx, transitions)
             tm.add_transition_for_multi_tapes(tape_idx, transitions)
-
+        
+        # print(tm.transitions)
         initial_state = file.readline().strip()
         final_state = file.readline().strip()
 
         tm.set_num_tapes(num_tapes)
+        tm.set_num_transitions(num_transitions)
         tm.set_initial_state(initial_state)
         tm.add_accept_state(final_state)
 
