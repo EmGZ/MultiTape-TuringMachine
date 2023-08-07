@@ -157,7 +157,7 @@ class TuringMachineGUI(tk.Tk):
         for i in range(len(self.tm.tapes)):
                 tape_content = self.tape_entries[i].get()
                 self.tm.tapes[i] = list(tape_content)
-        self.output_text.insert(tk.END, "Initial Configuration: \n")
+        self.output_text.insert(tk.END, "Starting: \n")
         self.display_current_configuration()
         self.step_button.config(state=tk.NORMAL)
         self.start_button.config(state=tk.DISABLED)
